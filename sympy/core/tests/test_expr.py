@@ -860,6 +860,14 @@ def test_trunc():
     raises(TypeError, lambda: math.trunc(oo))
 
 
+class CustomAdd(Add):
+    pass
+
+
+class CustomMul(Mul):
+    pass
+
+
 def test_as_independent():
     assert S.Zero.as_independent(x, as_Add=True) == (0, 0)
     assert S.Zero.as_independent(x, as_Add=False) == (0, 0)
@@ -916,6 +924,22 @@ def test_as_independent():
     assert eq.as_independent(x) == (-6, Mul(x, 1/x, evaluate=False))
 
     assert (x*y).as_independent(z, as_Add=True) == (x*y, 0)
+
+    # subclassing Add and Mul
+    eq = CustomAdd(y, CustomMul(x, y), z)
+    ind, dep = eq.as_independent(x)
+    assert ind - (y + z) == 0
+    assert isinstance(ind, CustomAdd)
+    assert dep/(x*y) == 1
+    assert isinstance(dep, CustomMul)
+
+    eq = CustomMul(y, CustomAdd(x, y), z)
+    ind, dep = eq.as_independent(x)
+    assert ind/(y*z) == 1
+    assert isinstance(ind, CustomMul)
+    assert dep - (x + y) == 0
+    assert isinstance(dep, CustomAdd)
+
 
 @XFAIL
 def test_call_2():
@@ -2118,6 +2142,18 @@ def test_round():
         assert S.true not in (eq > 1, eq < 1)
         assert int(eq) == int(.9) == 0
         assert int(-eq) == int(-.9) == 0
+
+    # https://github.com/sympy/sympy/issues/28279
+    phi = (1+sqrt(5))/2
+    def a(n):
+        return int(2**n *log(phi)/log(10)-Rational(1, 2)*log(5)/log(10))+1
+
+    a857 = int("200829212952178927690909380949249948846461002549293765663931"
+               "695493228490311245625332991209824760595495085562557651697891"
+               "081559764342218116754386067315347927714197626480253219546461"
+               "109143700506913638072400645037349873738547576011048498684505"
+               "520181585966267100")
+    assert a(857) == a857
 
 
 def test_held_expression_UnevaluatedExpr():
