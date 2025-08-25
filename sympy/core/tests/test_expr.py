@@ -2342,7 +2342,7 @@ def test_Expr__eq__iterable_handling():
     assert x != range(3)
 
 @pytest.mark.skipif(
-        sys.version_info < ('3', '12'),
+        sys.version_info < (3, 12),
         reason = "Format works for Python version >= 3.12"
 )
 def test_format():
