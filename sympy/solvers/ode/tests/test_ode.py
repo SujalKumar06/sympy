@@ -847,13 +847,13 @@ def test_homogeneous_function():
     eq5 = exp((2*x**2)/(3*f(x)**2))
     eq6 = log((3*x + 4*f(x))/(5*f(x) + 7*x) + exp((2*x**2)/(3*f(x)**2)))
     eq7 = sin((3*x)/(5*f(x) + x**2))
-    assert homogeneous_order(eq1, x, f(x)) == None
+    assert homogeneous_order(eq1, x, f(x)) is None
     assert homogeneous_order(eq2, x, f(x)) == 0
-    assert homogeneous_order(eq3, x, f(x)) == None
+    assert homogeneous_order(eq3, x, f(x)) is None
     assert homogeneous_order(eq4, x, f(x)) == 0
     assert homogeneous_order(eq5, x, f(x)) == 0
     assert homogeneous_order(eq6, x, f(x)) == 0
-    assert homogeneous_order(eq7, x, f(x)) == None
+    assert homogeneous_order(eq7, x, f(x)) is None
 
 
 def test_linear_coeff_match():
@@ -1077,10 +1077,14 @@ def test_issue_22604():
     eqs = [eq1, eq2]
     [x1sol, x2sol] = dsolve(eqs, [x1(t), x2(t)], ics = {x1(0):0, x1(t).diff().subs(t,0):0, \
                                                         x2(0):1, x2(t).diff().subs(t,0):0})
-    assert x1sol == Eq(x1(t), sqrt(3 - sqrt(5))*(sqrt(10) + 5*sqrt(2))*cos(sqrt(2)*t*sqrt(3 - sqrt(5))/2)/20 + \
-                       (-5*sqrt(2) + sqrt(10))*sqrt(sqrt(5) + 3)*cos(sqrt(2)*t*sqrt(sqrt(5) + 3)/2)/20)
-    assert x2sol == Eq(x2(t), (sqrt(5) + 5)*cos(sqrt(2)*t*sqrt(3 - sqrt(5))/2)/10 + (5 - sqrt(5))*cos(sqrt(2)*t*sqrt(sqrt(5) + 3)/2)/10)
-
+    assert x1sol == Eq(x1(t), (-sqrt(5) + 3 + 3*sqrt(2)*sqrt(3 - sqrt(5)))
+                       *cos(sqrt(2)*t*sqrt(3 - sqrt(5))/2)/10 - sqrt(sqrt(5) + 3)
+                       *(-sqrt(3 - sqrt(5)) + 2*sqrt(2))*cos(sqrt(2)*t*sqrt(sqrt(5) + 3)/2)/10)
+    assert x2sol == Eq(x2(t), (-2 + 3*sqrt(2)*sqrt(3 - sqrt(5))
+                        + 2*sqrt(5) + 3*sqrt(10)*sqrt(3 - sqrt(5)))*cos(sqrt(2)
+                        *t*sqrt(3 - sqrt(5))/2)/20 + sqrt(sqrt(5) + 3)*(-2*sqrt(2) - sqrt(5)
+                        *sqrt(3 - sqrt(5)) + sqrt(3 - sqrt(5)) + 2*sqrt(10))
+                        *cos(sqrt(2)*t*sqrt(sqrt(5) + 3)/2)/20)
 
 def test_issue_22462():
     for de in [

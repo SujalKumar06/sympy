@@ -162,6 +162,7 @@ def test_latex_basic():
 
     assert latex(1/x) == r"\frac{1}{x}"
     assert latex(1/x, fold_short_frac=True) == r"1 / x"
+    assert latex((x + y)**-1, fold_short_frac=True) == r"1 / \left(x + y\right)"
     assert latex(-S(3)/2) == r"- \frac{3}{2}"
     assert latex(-S(3)/2, fold_short_frac=True) == r"- 3 / 2"
     assert latex(1/x**2) == r"\frac{1}{x^{2}}"
@@ -262,6 +263,7 @@ def test_latex_basic():
     assert latex(Pow(Rational(1, 3), -1, evaluate=False)) == r"\frac{1}{\frac{1}{3}}"
     assert latex(Pow(Rational(1, 3), -2, evaluate=False)) == r"\frac{1}{(\frac{1}{3})^{2}}"
     assert latex(Pow(Integer(1)/100, -1, evaluate=False)) == r"\frac{1}{\frac{1}{100}}"
+    assert latex(Pow(I, -4, evaluate=False)) == r"\frac{1}{i^{4}}"
 
     p = Symbol('p', positive=True)
     assert latex(exp(-p)*log(p)) == r"e^{- p} \log{\left(p \right)}"
@@ -943,6 +945,18 @@ def test_latex_derivatives():
     n2 = Symbol('n2')
     assert latex(diff(f(x), (x, Max(n1, n2)))) == \
         r'\frac{d^{\max\left(n_{1}, n_{2}\right)}}{d x^{\max\left(n_{1}, n_{2}\right)}} f{\left(x \right)}'
+
+    # parenthesizing of the argument
+    g = Function("g")
+    # addition always parenthesized
+    for mul_symbol in (None, 'dot'):
+        assert latex(Derivative(f(x) + g(x), x), mul_symbol=mul_symbol) == \
+            r"\frac{d}{d x} \left(f{\left(x \right)} + g{\left(x \right)}\right)"
+    # multiplication parenthesized only if mul_symbol isn't None
+    assert latex(Derivative(f(x) * g(x), x)) == \
+        r"\frac{d}{d x} f{\left(x \right)} g{\left(x \right)}"
+    assert latex(Derivative(f(x) * g(x), x), mul_symbol='dot') == \
+        r"\frac{d}{d x} \left(f{\left(x \right)} \cdot g{\left(x \right)}\right)"
 
     # set diff operator
     assert latex(diff(f(x), x), diff_operator="rd") == r'\frac{\mathrm{d}}{\mathrm{d} x} f{\left(x \right)}'
@@ -2210,6 +2224,12 @@ def test_ElementwiseApplyFunction():
     assert latex(expr) == r'{\left( x \mapsto \frac{1}{x} \right)}_{\circ}\left({X}\right)'
 
 
+def test_MatrixUnit():
+    from sympy.matrices.expressions.special import MatrixUnit
+    assert latex(MatrixUnit(3, 3, 1, 2), mat_symbol_style='plain') == 'E_{1,2}'
+    assert latex(MatrixUnit(3, 3, 1, 2), mat_symbol_style='bold') == r'\mathcal{E}_{1,2}'
+
+
 def test_ZeroMatrix():
     from sympy.matrices.expressions.special import ZeroMatrix
     assert latex(ZeroMatrix(1, 1), mat_symbol_style='plain') == r"0"
@@ -2744,7 +2764,7 @@ def test_issue_9216():
     assert latex(expr_2) == r"1^{1^{-1}}"
 
     expr_3 = Pow(3, -2, evaluate=False)
-    assert latex(expr_3) == r"\frac{1}{9}"
+    assert latex(expr_3) == r"\frac{1}{3^{2}}"
 
     expr_4 = Pow(1, -2, evaluate=False)
     assert latex(expr_4) == r"1^{-2}"

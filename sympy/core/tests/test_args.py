@@ -3261,6 +3261,11 @@ def test_sympy__matrices__expressions__special__ZeroMatrix():
     assert _test_args(ZeroMatrix(3, 5))
 
 
+def test_sympy__matrices__expressions__special__MatrixUnit():
+    from sympy.matrices.expressions.special import MatrixUnit
+    assert _test_args(MatrixUnit(8, 9, 3, 5))
+
+
 def test_sympy__matrices__expressions__special__GenericZeroMatrix():
     from sympy.matrices.expressions.special import GenericZeroMatrix
     assert _test_args(GenericZeroMatrix())
@@ -5175,6 +5180,12 @@ def test_sympy__tensor__array__expressions__array_expressions__Reshape():
     from sympy.tensor.array.expressions.array_expressions import ArraySymbol, Reshape
     A = ArraySymbol("A", (4,))
     assert _test_args(Reshape(A, (2, 2)))
+
+
+def test_sympy__tensor__array__expressions__array_expressions__ArraySum():
+    from sympy.tensor.array.expressions.array_expressions import ArraySum, ArraySymbol
+    A = ArraySymbol("A", (3, 3))
+    assert _test_args(ArraySum(A*sin(a), (a, 1, b)))
 
 
 def test_sympy__codegen__ast__Assignment():
